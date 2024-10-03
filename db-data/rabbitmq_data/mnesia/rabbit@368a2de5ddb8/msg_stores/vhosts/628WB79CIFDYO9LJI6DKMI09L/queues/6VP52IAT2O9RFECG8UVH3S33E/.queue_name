@@ -1,0 +1,3 @@
+VHOST: /
+QUEUE: order_placed
+INDEX: v2

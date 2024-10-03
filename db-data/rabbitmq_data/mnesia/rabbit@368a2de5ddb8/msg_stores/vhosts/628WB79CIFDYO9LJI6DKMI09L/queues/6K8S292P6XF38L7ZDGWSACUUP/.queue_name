@@ -1,0 +1,3 @@
+VHOST: /
+QUEUE: order_shipped
+INDEX: v2

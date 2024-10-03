@@ -1,0 +1,3 @@
+VHOST: /
+QUEUE: inventory_updated
+INDEX: v2

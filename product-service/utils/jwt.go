@@ -17,6 +17,7 @@ func getEnv(key, defaultValue string) string {
 }
 
 type Claims struct {
+	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }

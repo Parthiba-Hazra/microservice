@@ -2,8 +2,11 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"io"
 	"log"
+	"net/http"
 	"order-service/models"
+	"order-service/utils"
 	"sync"
 
 	"github.com/streadway/amqp"
@@ -130,4 +133,41 @@ func listenForUserRegistered() {
 			mutex.Unlock()
 		}
 	}()
+}
+
+func LoadExistingProducts() {
+	url := utils.ProductServiceURL + "/products"
+	resp, err := utils.HTTPClient.Get(url)
+	if err != nil {
+		log.Printf("Failed to fetch products from Product Service: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		log.Printf("Failed to fetch products: %s", string(bodyBytes))
+		return
+	}
+
+	var responseData map[string][]models.Product
+	err = json.NewDecoder(resp.Body).Decode(&responseData)
+	if err != nil {
+		log.Printf("Failed to parse products response: %v", err)
+		return
+	}
+
+	products, exists := responseData["products"]
+	if !exists {
+		log.Printf("No 'products' field in response")
+		return
+	}
+
+	mutex.Lock()
+	for _, product := range products {
+		ProductCatalog[product.ID] = product
+	}
+	mutex.Unlock()
+
+	log.Printf("Loaded %d products from Product Service", len(products))
 }

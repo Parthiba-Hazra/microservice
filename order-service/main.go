@@ -4,6 +4,7 @@ import (
 	"order-service/db"
 	"order-service/handlers"
 	"order-service/rabbitmq"
+	"order-service/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +17,12 @@ func main() {
 	// Initialize RabbitMQ
 	rabbitmq.Init()
 	defer rabbitmq.Close()
+
+	// Initialize HTTP Client
+	utils.InitHTTPClient()
+
+	// Load existing products from Product Service
+	rabbitmq.LoadExistingProducts()
 
 	// Start listening for events
 	rabbitmq.ListenForEvents()

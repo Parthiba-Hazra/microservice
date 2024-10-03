@@ -49,7 +49,7 @@ func Authenticate(c *gin.Context) {
 	c.Next()
 }
 
-var mutex = &sync.Mutex{}
+var mutex = &sync.RWMutex{}
 
 func PlaceOrder(c *gin.Context) {
 	// Authentication
@@ -240,8 +240,8 @@ func getOrderItems(orderID int) ([]models.OrderItem, error) {
 }
 
 func getProductDetails(productID int) (models.Product, bool) {
-	mutex.Lock()
-	defer mutex.Unlock()
+	mutex.RLock()
+	defer mutex.RUnlock()
 	product, exists := rabbitmq.ProductCatalog[productID]
 	return product, exists
 }

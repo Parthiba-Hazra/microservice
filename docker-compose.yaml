@@ -43,9 +43,11 @@ services:
       - POSTGRES_DB=mydb
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - JWT_SECRET_KEY=your_secret_key
+      - PRODUCT_SERVICE_URL=http://product-service:8082
     depends_on:
       - postgres
       - rabbitmq
+      - product-service
 
   postgres:
     image: "postgres:15"
