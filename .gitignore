@@ -1,2 +1,7 @@
-./db-data/postgres_data/*
-./db-data/rabbitmq_data/*
+# Ignore everything in the directories
+db-data/postgres_data/*
+db-data/rabbitmq_data/*
+
+# But keep the directories
+!db-data/postgres_data/
+!db-data/rabbitmq_data/
