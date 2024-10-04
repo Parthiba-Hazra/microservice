@@ -1,12 +1,13 @@
-module graphql
+module graphql-gateway
 
 go 1.22.5
 
 toolchain go1.22.8
 
 require (
-	github.com/99designs/gqlgen v0.17.54
-	github.com/vektah/gqlparser/v2 v2.5.16
+	github.com/99designs/gqlgen v0.17.55
+	github.com/go-chi/chi v1.5.5
+	github.com/vektah/gqlparser/v2 v2.5.17
 )
 
 require (

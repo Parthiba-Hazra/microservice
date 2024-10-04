@@ -1,4 +1,13 @@
 services:
+  graphql-gateway:
+    build: ./graphql-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+    environment:
+      - USER_SERVICE_URL=http://user-service:8081
+
   user-service:
     build: ./user_service
     ports:

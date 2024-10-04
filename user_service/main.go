@@ -22,13 +22,13 @@ func main() {
 
 	r.POST("/register", handlers.RegisterUser)
 	r.POST("/login", handlers.LoginUser)
+	r.GET("/users", handlers.GetAllUsers)
+	r.GET("/users/:id", handlers.GetUserByID)
 
 	// Protected routes
 	authorized := r.Group("/", handlers.Authenticate)
 	{
 		authorized.PUT("/profile", handlers.UpdateProfile)
-		authorized.GET("/users", handlers.GetAllUsers)
-		authorized.GET("/users/:id", handlers.GetUserByID)
 	}
 
 	// Start server
