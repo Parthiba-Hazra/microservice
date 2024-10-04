@@ -5,6 +5,57 @@ package model
 type Mutation struct {
 }
 
+type Order struct {
+	ID        string       `json:"id"`
+	UserID    int          `json:"user_id"`
+	Status    string       `json:"status"`
+	Total     float64      `json:"total"`
+	CreatedAt string       `json:"created_at"`
+	Items     []*OrderItem `json:"items"`
+}
+
+type OrderInput struct {
+	Items []*OrderItemInput `json:"items"`
+}
+
+type OrderItem struct {
+	ID        string  `json:"id"`
+	OrderID   int     `json:"order_id"`
+	ProductID int     `json:"product_id"`
+	Quantity  int     `json:"quantity"`
+	Price     float64 `json:"price"`
+}
+
+type OrderItemInput struct {
+	ProductID int `json:"product_id"`
+	Quantity  int `json:"quantity"`
+}
+
+type OrderResponse struct {
+	Message string `json:"message"`
+	OrderID string `json:"order_id"`
+}
+
+type Product struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Inventory   int     `json:"inventory"`
+	CreatedAt   string  `json:"created_at"`
+}
+
+type ProductInput struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Inventory   int     `json:"inventory"`
+}
+
+type ProductResponse struct {
+	Message string `json:"message"`
+}
+
 type Query struct {
 }
 

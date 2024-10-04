@@ -1,3 +1,4 @@
+# User Schema
 type User {
   id: ID!
   username: String!
@@ -11,15 +12,87 @@ input RegisterInput {
   password: String!
 }
 
-type Query {
-  users: [User!]!
-  user(id: ID!): User
+# Product Schema
+type Product {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  inventory: Int!
+  created_at: String!
 }
 
+input ProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  inventory: Int!
+}
+
+# Order Schema
+type Order {
+  id: ID!
+  user_id: Int!
+  status: String!
+  total: Float!
+  created_at: String!
+  items: [OrderItem!]!
+}
+
+type OrderItem {
+  id: ID!
+  order_id: Int!
+  product_id: Int!
+  quantity: Int!
+  price: Float!
+}
+
+input OrderItemInput {
+  product_id: Int!
+  quantity: Int!
+}
+
+input OrderInput {
+  items: [OrderItemInput!]!
+}
+
+# Queries
+type Query {
+  # User Queries
+  users: [User!]!
+  user(id: ID!): User
+
+  # Product Queries
+  products: [Product!]!
+  product(id: ID!): Product
+
+  # Order Queries
+  orders: [Order!]!
+  order(id: ID!): Order
+}
+
+# Mutations
+type Mutation {
+  # User Mutations
+  registerUser(input: RegisterInput!): RegisterUserResponse
+
+  # Product Mutations
+  createProduct(input: ProductInput!): ProductResponse
+
+  # Order Mutations
+  placeOrder(input: OrderInput!): OrderResponse
+}
+
+# Response Types
 type RegisterUserResponse {
   message: String!
 }
 
-type Mutation {
-  registerUser(input: RegisterInput!): RegisterUserResponse
+type ProductResponse {
+  message: String!
+}
+
+type OrderResponse {
+  message: String!
+  order_id: ID!
 }

@@ -5,8 +5,10 @@ services:
       - "8080:8080"
     depends_on:
       - user-service
+      - product-service
     environment:
       - USER_SERVICE_URL=http://user-service:8081
+      - PRODUCT_SERVICE_URL=http://product-service:8082
 
   user-service:
     build: ./user_service

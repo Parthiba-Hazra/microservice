@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"graphql-gateway/graph"
 	"net/http"
 	"os"
@@ -20,6 +21,9 @@ func main() {
 
 	router := chi.NewRouter()
 
+	// Middleware to add Authorization header to context
+	router.Use(authorizationMiddleware)
+
 	// GraphQL handler
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
@@ -27,4 +31,17 @@ func main() {
 	router.Handle("/query", srv)
 
 	http.ListenAndServe(":"+port, router)
+}
+
+func authorizationMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract the Authorization header from the request
+		authHeader := r.Header.Get("Authorization")
+
+		// Add it to the context
+		ctx := context.WithValue(r.Context(), "Authorization", authHeader)
+
+		// Pass the updated context to the next handler
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
