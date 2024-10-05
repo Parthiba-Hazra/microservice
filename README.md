@@ -16,7 +16,7 @@ This project contains three main micro-services and a GraphQL gateway:
     -   **POST /register**: Register a new user.
     -   **POST /login**: Login a user and receive a JWT token.
     -   **GET /users**: Retrieve all users.
-    -   **GET /users/{:user_id}**
+    -   **GET /users/{user_id}**
         
         : Retrieve a user by ID.
     -   **PUT /profile**: Update user profile (authenticated users only).
@@ -27,7 +27,7 @@ This project contains three main micro-services and a GraphQL gateway:
 
 -   **Endpoints**:
     -   **GET /products**: Retrieve a list of all products.
-    -   **GET /products/**
+    -   **GET /products/{product_id}**
         
         : Retrieve product details by ID.
     -   **POST /products**: Create a new product (admin only).
@@ -45,7 +45,7 @@ This project contains three main micro-services and a GraphQL gateway:
 -   **Endpoints**:
     -   **POST /orders**: Place a new order.
     -   **GET /orders**: Retrieve orders for the authenticated user.
-    -   **GET /orders/{:order_id}**
+    -   **GET /orders/{order_id}**
         
         : Retrieve specific order details by ID.
 -   **Prometheus Metrics Endpoint**:
@@ -282,7 +282,7 @@ Retrieve order information associated with Authorization header
     
     
     ```
-    curl -X PUT http://localhost:8082/products/{:product_id} \
+    curl -X PUT http://localhost:8082/products/{product_id} \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer YOUR_ADMIN_TOKEN' \
     -d '{
@@ -297,7 +297,7 @@ Retrieve order information associated with Authorization header
     
     
     ```
-    curl -X DELETE http://localhost:8082/products/{:product_id} \
+    curl -X DELETE http://localhost:8082/products/{product_id} \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer YOUR_ADMIN_TOKEN'
     ``` 
@@ -380,7 +380,7 @@ curl -X POST http://localhost:8083/orders \
 
 
 ```
-curl -X PUT http://localhost:8082/products/{:product_id} \
+curl -X PUT http://localhost:8082/products/{product_id} \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer YOUR_ADMIN_TOKEN' \
 -d '{
