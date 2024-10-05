@@ -84,8 +84,6 @@ The GraphQL Gateway is the main access point for interacting with the entire sys
     
 2.  Build and run the services using Docker Compose:
     
-
-    
     `docker-compose up --build` 
     
 3.  Once all services are running, you can access them using the following ports:
@@ -104,6 +102,14 @@ Each service has a Prometheus endpoint available at `/metrics`. You can scrape t
 -   ***To perform admin-level operations (such as creating or updating products), you need to create a user with the username "admin."***
 -   Use the `/register` and `/login` endpoints to obtain JWT tokens for authentication.
 -   Provide the JWT token in the `Authorization` header in the format `Bearer YOUR_TOKEN` for protected endpoints.
+
+## Postman Collection
+
+You can use the provided Postman collection to test each endpoint of the services. Make sure to include the necessary JWT tokens for secured endpoints.
+
+**Import the collection**:
+
+-   Use the provided JSON collection [`Microservices.postman_collection.json`](/Microservices%20Application.postman_collection.json) to import into Postman.
 
 ## GraphQL Playground
 
