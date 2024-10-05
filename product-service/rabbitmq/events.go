@@ -61,6 +61,57 @@ func EmitInventoryUpdated(productID int, newInventory int) {
 	}
 }
 
+func EmitProductUpdated(product models.Product) {
+	body, err := json.Marshal(product)
+	if err != nil {
+		log.Printf("Failed to serialize product: %v", err)
+		return
+	}
+
+	err = Channel.Publish(
+		"",                // exchange
+		"product_updated", // routing key
+		false,             // mandatory
+		false,             // immediate
+		amqp.Publishing{
+			ContentType:  "application/json",
+			Body:         body,
+			DeliveryMode: amqp.Persistent,
+		})
+	if err != nil {
+		log.Printf("Failed to publish product_updated event: %v", err)
+	} else {
+		log.Printf("Product Updated Event emitted: %s", body)
+	}
+}
+
+func EmitProductDeleted(productID int) {
+	event := map[string]int{
+		"product_id": productID,
+	}
+	body, err := json.Marshal(event)
+	if err != nil {
+		log.Printf("Failed to serialize product deleted event: %v", err)
+		return
+	}
+
+	err = Channel.Publish(
+		"",                // exchange
+		"product_deleted", // routing key
+		false,             // mandatory
+		false,             // immediate
+		amqp.Publishing{
+			ContentType:  "application/json",
+			Body:         body,
+			DeliveryMode: amqp.Persistent,
+		})
+	if err != nil {
+		log.Printf("Failed to publish product_deleted event: %v", err)
+	} else {
+		log.Printf("Product Deleted Event emitted: %s", body)
+	}
+}
+
 func ListenForOrderPlacedEvents() {
 	msgs, err := Channel.Consume(
 		"order_placed", // queue
@@ -92,13 +143,16 @@ func ListenForOrderPlacedEvents() {
 
 func updateInventory(orderEvent models.OrderPlacedEvent) {
 	for _, item := range orderEvent.Items {
-		query := `UPDATE products SET inventory = inventory - $1 WHERE id = $2`
-		_, err := db.DB.Exec(query, item.Quantity, item.ProductID)
+		// Modify the query to return the updated inventory after the update
+		query := `UPDATE products SET inventory = inventory - $1 WHERE id = $2 RETURNING inventory`
+
+		var updatedInventory int
+		err := db.DB.QueryRow(query, item.Quantity, item.ProductID).Scan(&updatedInventory)
 		if err != nil {
 			log.Printf("Failed to update inventory for product %d: %v", item.ProductID, err)
 		} else {
-			EmitInventoryUpdated(item.ProductID, item.Quantity)
-			log.Printf("Inventory updated for product %d", item.ProductID)
+			EmitInventoryUpdated(item.ProductID, updatedInventory)
+			log.Printf("Inventory updated for product %d, new inventory: %d", item.ProductID, updatedInventory)
 		}
 	}
 }

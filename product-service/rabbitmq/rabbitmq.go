@@ -40,7 +40,7 @@ func Init() {
 }
 
 func declareQueues() {
-	queues := []string{"product_created", "inventory_updated", "order_placed"}
+	queues := []string{"product_created", "product_updated", "product_deleted", "inventory_updated", "order_placed"}
 
 	for _, queueName := range queues {
 		_, err := Channel.QueueDeclare(

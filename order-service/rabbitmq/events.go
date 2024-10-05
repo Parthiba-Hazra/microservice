@@ -73,6 +73,15 @@ func ListenForEvents() {
 
 	// Listen for "User Registered" events
 	go listenForUserRegistered()
+
+	// Listen for "Inventory Updated" events
+	go listenForInventoryUpdated()
+
+	// Listen for "Product Updated" events
+	go listenForProductUpdated()
+
+	// Listen for "Product Deleted" events
+	go listenForProductDeleted()
 }
 
 func listenForProductCreated() {
@@ -105,6 +114,45 @@ func listenForProductCreated() {
 	}()
 }
 
+func listenForInventoryUpdated() {
+	msgs, err := Channel.Consume(
+		"inventory_updated", // queue
+		"",                  // consumer
+		true,                // auto-ack
+		false,               // exclusive
+		false,               // no-local
+		false,               // no-wait
+		nil,                 // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to register consumer for inventory_updated: %v", err)
+	}
+
+	go func() {
+		for d := range msgs {
+			var inventoryUpdate models.InventoryUpdateEvent
+			err := json.Unmarshal(d.Body, &inventoryUpdate)
+			if err != nil {
+				log.Printf("Failed to parse inventory updated event: %v", err)
+				continue
+			}
+
+			log.Printf("Received Inventory Updated Event: %+v", inventoryUpdate)
+
+			// Update product inventory in the ProductCatalog
+			mutex.Lock()
+			if product, exists := ProductCatalog[inventoryUpdate.ProductID]; exists {
+				product.Inventory = inventoryUpdate.NewInventory
+				ProductCatalog[inventoryUpdate.ProductID] = product
+				log.Printf("Product %d inventory updated to %d", inventoryUpdate.ProductID, inventoryUpdate.NewInventory)
+			} else {
+				log.Printf("Product %d not found in ProductCatalog", inventoryUpdate.ProductID)
+			}
+			mutex.Unlock()
+		}
+	}()
+}
+
 func listenForUserRegistered() {
 	msgs, err := Channel.Consume(
 		"user_registered", // queue
@@ -130,6 +178,67 @@ func listenForUserRegistered() {
 			log.Printf("Received User Registered Event: %+v", user)
 			mutex.Lock()
 			UserRegistry[user.ID] = user
+			mutex.Unlock()
+		}
+	}()
+}
+
+func listenForProductUpdated() {
+	msgs, err := Channel.Consume(
+		"product_updated", // queue
+		"",                // consumer
+		true,              // auto-ack
+		false,             // exclusive
+		false,             // no-local
+		false,             // no-wait
+		nil,               // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to register consumer for product_updated: %v", err)
+	}
+
+	go func() {
+		for d := range msgs {
+			var product models.Product
+			err := json.Unmarshal(d.Body, &product)
+			if err != nil {
+				log.Printf("Failed to parse product updated event: %v", err)
+				continue
+			}
+			log.Printf("Received Product Updated Event: %+v", product)
+			mutex.Lock()
+			ProductCatalog[product.ID] = product
+			mutex.Unlock()
+		}
+	}()
+}
+
+func listenForProductDeleted() {
+	msgs, err := Channel.Consume(
+		"product_deleted", // queue
+		"",                // consumer
+		true,              // auto-ack
+		false,             // exclusive
+		false,             // no-local
+		false,             // no-wait
+		nil,               // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to register consumer for product_deleted: %v", err)
+	}
+
+	go func() {
+		for d := range msgs {
+			var event map[string]int
+			err := json.Unmarshal(d.Body, &event)
+			if err != nil {
+				log.Printf("Failed to parse product deleted event: %v", err)
+				continue
+			}
+			productID := event["product_id"]
+			log.Printf("Received Product Deleted Event for Product ID: %d", productID)
+			mutex.Lock()
+			delete(ProductCatalog, productID)
 			mutex.Unlock()
 		}
 	}()

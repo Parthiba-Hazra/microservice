@@ -42,12 +42,19 @@ type OrderShippedEvent struct {
 }
 
 type Product struct {
-	ID    int     `json:"id"`
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Inventory   int     `json:"inventory"`
 }
 
 type User struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
+}
+
+type InventoryUpdateEvent struct {
+	ProductID    int `json:"product_id"`
+	NewInventory int `json:"new_inventory"`
 }

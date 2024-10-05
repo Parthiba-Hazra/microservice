@@ -75,6 +75,13 @@ func PlaceOrder(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Product %d not found", item.ProductID)})
 			return
 		}
+
+		// Check if requested quantity exceeds available inventory
+		if item.Quantity > product.Inventory {
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Product %d has insufficient inventory", item.ProductID)})
+			return
+		}
+
 		itemTotal := product.Price * float64(item.Quantity)
 		total += itemTotal
 		orderItems = append(orderItems, models.OrderItem{

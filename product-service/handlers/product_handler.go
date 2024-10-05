@@ -145,6 +145,8 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
+	input.ID, _ = strconv.Atoi(idParam)
+	rabbitmq.EmitProductUpdated(input)
 	c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
 }
 
@@ -170,5 +172,6 @@ func DeleteProduct(c *gin.Context) {
 		return
 	}
 
+	rabbitmq.EmitProductDeleted(id)
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
