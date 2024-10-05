@@ -205,6 +205,12 @@ Retrieve order information associated with Authorization header
       }
     }
     ``` 
+    Header:
+    `
+    {
+  "Authorization": "Bearer YOUR_TOKEN"
+}
+    `
     
 2.  **Get Order By ID**
     
@@ -226,6 +232,12 @@ Retrieve order information associated with Authorization header
       }
     }
     ``` 
+    Header:
+    `
+    {
+  "Authorization": "Bearer YOUR_TOKEN"
+}
+    `
     
 
 ### User Mutations
@@ -259,6 +271,12 @@ Retrieve order information associated with Authorization header
       }
     }
     ``` 
+    Header:
+    `
+    {
+  "Authorization": "Bearer ADMIN_TOKEN"
+}
+    `
     
 2.  **Update Product** (Admin Only / via a REST endpoint)
     
