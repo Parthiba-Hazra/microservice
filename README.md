@@ -280,37 +280,10 @@ Retrieve order information associated with Authorization header
   "Authorization": "Bearer ADMIN_TOKEN"
 }
     `
-    
-2.  **Update Product** (Admin Only / via a REST endpoint)
-    
-    
-    ```
-    curl -X PUT http://localhost:8082/products/{product_id} \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_ADMIN_TOKEN' \
-    -d '{
-      "name": "Updated Product Name",
-      "description": "Updated description",
-      "price": 39.99,
-      "inventory": 150
-    }'
-    ``` 
-    
-3.  **Delete Product** (Admin Only / via a REST endpoint)
-    
-    
-    ```
-    curl -X DELETE http://localhost:8082/products/{product_id} \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_ADMIN_TOKEN'
-    ``` 
-    
-
 ### Order Mutations
 
 1.  **Place Order**
 
-    
     ```
     mutation {
       placeOrder(input: {
@@ -348,7 +321,6 @@ curl -X POST http://localhost:8081/register \
 
 **Login User**:
 
-
 ```
 curl -X POST http://localhost:8081/login \
 -H 'Content-Type: application/json' \
@@ -357,31 +329,15 @@ curl -X POST http://localhost:8081/login \
 
 **Create Product**:
 
-
 ```
 curl -X POST http://localhost:8082/products \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Bearer YOUR_ADMIN_TOKEN' \
 -d '{"name": "Product 12", "description": "A sample product 12", "price": 17.99, "inventory": 290}'
 ``` 
-
-**Place Order**:
-
-
-```
-curl -X POST http://localhost:8083/orders \
--H 'Content-Type: application/json' \
--H 'Authorization: Bearer YOUR_USER_TOKEN' \
--d '{
-  "items": [
-    {"product_id": 1, "quantity": 20}
-  ]
-}'
-``` 
-
-**Update Product**:
-
-
+    
+**Update Product** (Admin Only / via a REST endpoint)
+     
 ```
 curl -X PUT http://localhost:8082/products/{product_id} \
 -H 'Content-Type: application/json' \
@@ -391,6 +347,27 @@ curl -X PUT http://localhost:8082/products/{product_id} \
   "description": "Updated description",
   "price": 39.99,
   "inventory": 150
+}'
+``` 
+    
+ **Delete Product** (Admin Only / via a REST endpoint) 
+    
+```
+curl -X DELETE http://localhost:8082/products/{product_id} \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer YOUR_ADMIN_TOKEN'
+``` 
+
+**Place Order**:
+
+```
+curl -X POST http://localhost:8083/orders \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Bearer YOUR_USER_TOKEN' \
+-d '{
+  "items": [
+    {"product_id": 1, "quantity": 20}
+  ]
 }'
 ``` 
 
