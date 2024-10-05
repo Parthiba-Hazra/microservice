@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"graphql-gateway/cache"
 	"graphql-gateway/graph"
 	"net/http"
 	"os"
@@ -14,6 +15,9 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	// Initialize Redis client
+	cache.InitRedis()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort

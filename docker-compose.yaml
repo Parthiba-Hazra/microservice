@@ -6,9 +6,19 @@ services:
     depends_on:
       - user-service
       - product-service
+      - order-service
+      - redis
     environment:
       - USER_SERVICE_URL=http://user-service:8081
       - PRODUCT_SERVICE_URL=http://product-service:8082
+      - ORDER_SERVICE_URL=http://order-service:8083
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
 
   user-service:
     build: ./user_service
@@ -25,7 +35,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-  
+
   product-service:
     build: ./product-service
     ports:
@@ -41,7 +51,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-  
+
   order-service:
     build: ./order-service
     ports:

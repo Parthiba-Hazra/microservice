@@ -5,17 +5,41 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"graphql-gateway/cache"
 	"graphql-gateway/graph/model"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/go-redis/redis"
 )
 
 type Resolver struct{}
 
 // Query Resolver Implementation
 func (r *Resolver) Users(ctx context.Context) ([]*model.User, error) {
+	// Define the cache key
+	cacheKey := "users"
+
+	// Try to get data from Redis cache
+	cachedData, err := cache.RedisClient.Get(cacheKey).Result()
+	if err == nil {
+		// Cache hit: unmarshal the cached data
+		var users []*model.User
+		if err := json.Unmarshal([]byte(cachedData), &users); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cached users: %v", err)
+		}
+		fmt.Println("Cache hit: returning users from Redis")
+		return users, nil
+	} else if err != redis.Nil {
+		// Redis error (other than key not found)
+		return nil, fmt.Errorf("failed to get users from Redis: %v", err)
+	}
+
+	// Cache miss: fetch from User Service
+	fmt.Println("Cache miss: fetching users from User Service")
 	url := fmt.Sprintf("%s/users", getUserServiceURL())
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -68,10 +92,40 @@ func (r *Resolver) Users(ctx context.Context) ([]*model.User, error) {
 		usersPtr = append(usersPtr, userModel)
 	}
 
+	// Store data in Redis cache for 5 minutes
+	usersJSON, err := json.Marshal(usersPtr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal users for caching: %v", err)
+	}
+	err = cache.RedisClient.Set(cacheKey, usersJSON, 5*time.Minute).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to set users in Redis cache: %v", err)
+	}
+
 	return usersPtr, nil
 }
 
 func (r *Resolver) User(ctx context.Context, id string) (*model.User, error) {
+	// Define the cache key for the specific user
+	cacheKey := fmt.Sprintf("user:%s", id)
+
+	// Try to get data from Redis cache
+	cachedData, err := cache.RedisClient.Get(cacheKey).Result()
+	if err == nil {
+		// Cache hit: unmarshal the cached data
+		var user model.User
+		if err := json.Unmarshal([]byte(cachedData), &user); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cached user: %v", err)
+		}
+		fmt.Println("Cache hit: returning user from Redis")
+		return &user, nil
+	} else if err != redis.Nil {
+		// Redis error (other than key not found)
+		return nil, fmt.Errorf("failed to get user from Redis: %v", err)
+	}
+
+	// Cache miss: fetch from User Service
+	fmt.Println("Cache miss: fetching user from User Service")
 	url := fmt.Sprintf("%s/users/%s", getUserServiceURL(), id)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -113,7 +167,6 @@ func (r *Resolver) User(ctx context.Context, id string) (*model.User, error) {
 		return nil, fmt.Errorf("unexpected response format")
 	}
 
-	// Convert `id` to a string if it's an integer in the JSON response
 	idFloat, ok := userData["id"].(float64)
 	if !ok {
 		return nil, fmt.Errorf("unexpected type for id")
@@ -124,6 +177,16 @@ func (r *Resolver) User(ctx context.Context, id string) (*model.User, error) {
 		Username:  userData["username"].(string),
 		Email:     userData["email"].(string),
 		CreatedAt: userData["created_at"].(string),
+	}
+
+	// Store data in Redis cache for 5 minutes
+	userJSON, err := json.Marshal(user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal user for caching: %v", err)
+	}
+	err = cache.RedisClient.Set(cacheKey, userJSON, 5*time.Minute).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to set user in Redis cache: %v", err)
 	}
 
 	return user, nil
@@ -184,6 +247,26 @@ func getUserServiceURL() string {
 }
 
 func (r *Resolver) Products(ctx context.Context) ([]*model.Product, error) {
+	// Define the cache key
+	cacheKey := "products"
+
+	// Try to get data from Redis cache
+	cachedData, err := cache.RedisClient.Get(cacheKey).Result()
+	if err == nil {
+		// Cache hit: unmarshal the cached data
+		var products []*model.Product
+		if err := json.Unmarshal([]byte(cachedData), &products); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cached products: %v", err)
+		}
+		fmt.Println("Cache hit: returning products from Redis")
+		return products, nil
+	} else if err != redis.Nil {
+		// Redis error (other than key not found)
+		return nil, fmt.Errorf("failed to get products from Redis: %v", err)
+	}
+
+	// Cache miss: fetch from Product Service
+	fmt.Println("Cache miss: fetching products from Product Service")
 	url := fmt.Sprintf("%s/products", getProductServiceURL())
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -236,10 +319,40 @@ func (r *Resolver) Products(ctx context.Context) ([]*model.Product, error) {
 		products = append(products, productModel)
 	}
 
+	// Store data in Redis cache for 5 minutes
+	productsJSON, err := json.Marshal(products)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal products for caching: %v", err)
+	}
+	err = cache.RedisClient.Set(cacheKey, productsJSON, 5*time.Minute).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to set products in Redis cache: %v", err)
+	}
+
 	return products, nil
 }
 
 func (r *Resolver) Product(ctx context.Context, id string) (*model.Product, error) {
+	// Define the cache key for the specific product
+	cacheKey := fmt.Sprintf("product:%s", id)
+
+	// Try to get data from Redis cache
+	cachedData, err := cache.RedisClient.Get(cacheKey).Result()
+	if err == nil {
+		// Cache hit: unmarshal the cached data
+		var product *model.Product
+		if err := json.Unmarshal([]byte(cachedData), &product); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cached product: %v", err)
+		}
+		fmt.Println("Cache hit: returning product from Redis")
+		return product, nil
+	} else if err != redis.Nil {
+		// Redis error (other than key not found)
+		return nil, fmt.Errorf("failed to get product from Redis: %v", err)
+	}
+
+	// Cache miss: fetch from Product Service
+	fmt.Println("Cache miss: fetching product from Product Service")
 	url := fmt.Sprintf("%s/products/%s", getProductServiceURL(), id)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -291,6 +404,16 @@ func (r *Resolver) Product(ctx context.Context, id string) (*model.Product, erro
 		Price:       productData["price"].(float64),
 		Inventory:   int(productData["inventory"].(float64)),
 		CreatedAt:   productData["created_at"].(string),
+	}
+
+	// Store data in Redis cache for 5 minutes
+	productJSON, err := json.Marshal(product)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal product for caching: %v", err)
+	}
+	err = cache.RedisClient.Set(cacheKey, productJSON, 5*time.Minute).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to set product in Redis cache: %v", err)
 	}
 
 	return product, nil
