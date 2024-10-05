@@ -9,6 +9,9 @@ This project contains three main micro-services and a GraphQL gateway:
 2.  **Product Service**: Manages products, including creation, updates, deletions, and product information.
 3.  **Order Service**: Handles order creation, retrieval, and management.
 4.  **GraphQL Gateway**: Unifies all services into a single endpoint for querying and managing data using GraphQL.
+5   **RabbitMQ**: Facilitates asynchronous communication between microservices through queues. It is used for emitting and consuming events, such as `product_created`, `inventory_updated`, and `order_placed` to keep the data consistent across all services.
+
+Redis is specifically implemented in the GraphQL gateway to cache frequently requested data, like product listings, ensuring faster response times for repeated queries.
 
 ### User Service
 
