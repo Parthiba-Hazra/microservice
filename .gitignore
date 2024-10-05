@@ -1,4 +1,4 @@
 # Ignore everything in the directories
-db-data/postgres_data/
-db-data/rabbitmq_data/
-db-data/grafana-data/
+db-data/postgres_data/*
+db-data/rabbitmq_data/*
+db-data/grafana_data/*

@@ -669,11 +669,23 @@ func (r *Resolver) PlaceOrder(ctx context.Context, input model.OrderInput) (*mod
 	}
 	defer resp.Body.Close()
 
+	var apiResponse map[string]interface{}
+
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to place order: %s", resp.Status)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(body, &apiResponse)
+		if err != nil {
+			return nil, err
+		}
+
+		message, _ := apiResponse["error"].(string)
+		return nil, fmt.Errorf("failed to place order: %s", message)
 	}
 
-	var apiResponse map[string]interface{}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
