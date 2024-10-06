@@ -2,3 +2,7 @@
 db-data/postgres_data/*
 db-data/rabbitmq_data/*
 db-data/grafana_data/*
+
+!db-data/postgres_data/.foo
+!db-data/rabbitmq_data/.foo
+!db-data/grafana_data/.foo
