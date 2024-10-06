@@ -78,15 +78,33 @@ The GraphQL Gateway is the main access point for interacting with the entire sys
 1.  Clone the repository:
     
     
-    `git clone https://github.com/Parthiba-Hazra/microservice.git`
+    ```
+    git clone https://github.com/Parthiba-Hazra/microservice.git
     
-    `cd microservice` 
+    cd microservice
+    ``` 
+
+2. Create Required Directories
+
+    To persist the data for RabbitMQ, PostgreSQL, and Grafana, create a directory named `db-data` with subdirectories for each service.
+
+    Run the following commands to create these directories:
+
+    ```
+    mkdir -p db-data/postgres_data
+    mkdir -p db-data/rabbitmq_data
+    mkdir -p db-data/grafana_data
+    ``` 
+
+    These directories will be used to mount the data volumes for PostgreSQL, RabbitMQ, and Grafana, ensuring data persistence between container restarts.
     
-2.  Build and run the services using Docker Compose:
+3.  Build and run the services using Docker Compose:
     
-    `docker-compose up --build` 
+    ```
+    docker-compose up --build
+    ``` 
     
-3.  Once all services are running, you can access them using the following ports:
+4.  Once all services are running, you can access them using the following ports:
     
     -   **User Service**: `http://localhost:8081`
     -   **Product Service**: `http://localhost:8082`
